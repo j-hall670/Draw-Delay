@@ -8,7 +8,8 @@
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class MainComponent  : public juce::AudioAppComponent
+class MainComponent  : public juce::AudioAppComponent,
+                       public juce::Button::Listener
 {
 public:
     //==============================================================================
@@ -25,6 +26,7 @@ public:
     void resized() override;
 
     void mouseDown (const juce::MouseEvent& ev) override;
+    void buttonClicked (juce::Button* button) override;
 
 private:
     //==============================================================================
@@ -35,6 +37,8 @@ private:
     juce::Array <juce::Point<float>> mousePosArray; // Array of Points in float format - Point is X,Y coordinates, needs to be float because that's what mouse event gives
 
     int drawSquareValues[4]; // Parameters of box
+
+    juce::TextButton undoButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

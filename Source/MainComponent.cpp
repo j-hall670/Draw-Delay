@@ -13,6 +13,10 @@ MainComponent::MainComponent()
     firstLabel.setJustificationType (juce::Justification::centred);
     */
 
+    addAndMakeVisible (undoButton);
+    undoButton.setButtonText ("Undo");
+    undoButton.addListener (this);
+
     // Some platforms require permissions to open input channels so request that here
     if (juce::RuntimePermissions::isRequired (juce::RuntimePermissions::recordAudio)
         && ! juce::RuntimePermissions::isGranted (juce::RuntimePermissions::recordAudio))
@@ -92,6 +96,8 @@ void MainComponent::resized()
 
     //firstLabel.setBounds(juce::Component::getWidth() / 2, juce::Component::getHeight() / 2, 50, 50);
 
+    undoButton.setBounds (juce::Component::getWidth() / 1.4, juce::Component::getHeight() / 8, juce::Component::getWidth() / 10, juce::Component::getWidth() / 10);
+
     drawSquareValues[0] = juce::Component::getWidth() / 8;
     drawSquareValues[1] = juce::Component::getHeight() / 8;
     drawSquareValues[2] = juce::Component::getWidth() / 2;
@@ -108,6 +114,18 @@ void MainComponent::mouseDown (const juce::MouseEvent& ev)
     if (ev.position.x > drawSquareValues[0] && ev.position.x < width && ev.position.y > drawSquareValues[1] && ev.position.y < height)
     {
         mousePosArray.add(ev.position); // Add mouse click coordinates to array of points
+        repaint();
+    }
+}
+
+void MainComponent::buttonClicked(juce::Button* button) 
+{
+    // If circles have been drawn
+    if (mousePosArray.size() > 0)
+    {
+        // Remove them
+        int element = mousePosArray.size() - 1; // -1 because element index starts at 0
+        mousePosArray.remove(element);
         repaint();
     }
 }
