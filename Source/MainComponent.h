@@ -33,7 +33,8 @@ private:
     //juce::Label firstLabel;
 
     juce::Array <juce::Point<float>> mousePosArray; // Array of Points in float format - Point is X,Y coordinates, needs to be float because that's what mouse event gives
-    int arrayCount = 0; // To keep track of number of members in array 
+
+    int drawSquareValues[4]; // Parameters of box
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

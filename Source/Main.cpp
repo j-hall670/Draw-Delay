@@ -6,11 +6,13 @@
   ==============================================================================
 */
 
-//Notes
+//Todo:
 //==============================================================================
 
+//Add a button that removes the last one. Then you can implement the circle clicking afterwards
+//scale to the size of the window
 
-//Next step is to get the rectangles to disappear if you click them again:
+//Get the circles to disappear if you click them again:
 /*
 If i click within the bounds of a square, remove those coordinates from the array:
     iterate through array on click
@@ -19,6 +21,7 @@ If i click within the bounds of a square, remove those coordinates from the arra
 decrement arrayCount
 */
 
+//Make circles position (and size?) scalable to the window
 
 //==============================================================================
 

@@ -72,15 +72,15 @@ void MainComponent::paint (juce::Graphics& g)
 
     // You can add your drawing code here!
 
+    g.drawRect(drawSquareValues[0], drawSquareValues[1], drawSquareValues[2], drawSquareValues[3]);
 
-
-    for (int i = 0; i < arrayCount; i++)
+    for (int i = 0; i < mousePosArray.size(); i++)
     {
-        // Get array member of all rectangles
-        const int mouseX = mousePosArray.operator[](i).getX() - 5; // - 5 to centre square on mouse
-        const int mouseY = mousePosArray.operator[](i).getY() - 5;
+        // Get array member of all circles
+        int mouseX = mousePosArray.operator[](i).getX() - 5; // - 5 to centre circle on mouse
+        int mouseY = mousePosArray.operator[](i).getY() - 5;
 
-        g.fillRect(mouseX, mouseY, 10, 10); // Draw rect
+        g.fillEllipse(mouseX, mouseY, 10, 10); // Draw circle
     }
 }
 
@@ -91,12 +91,23 @@ void MainComponent::resized()
     // update their positions.
 
     //firstLabel.setBounds(juce::Component::getWidth() / 2, juce::Component::getHeight() / 2, 50, 50);
+
+    drawSquareValues[0] = juce::Component::getWidth() / 8;
+    drawSquareValues[1] = juce::Component::getHeight() / 8;
+    drawSquareValues[2] = juce::Component::getWidth() / 2;
+    drawSquareValues[3] = juce::Component::getHeight() / 2;
 }
 
 void MainComponent::mouseDown (const juce::MouseEvent& ev)
 {
-    mousePosArray.add (ev.position); // Add mouse click coordinates to array of points
-    arrayCount++;
+    // Set width and height of box
+    int width = drawSquareValues[0] + drawSquareValues[2];
+    int height = drawSquareValues[1] + drawSquareValues[3];
 
-    repaint();
+    // If click is within the box's bounds
+    if (ev.position.x > drawSquareValues[0] && ev.position.x < width && ev.position.y > drawSquareValues[1] && ev.position.y < height)
+    {
+        mousePosArray.add(ev.position); // Add mouse click coordinates to array of points
+        repaint();
+    }
 }
