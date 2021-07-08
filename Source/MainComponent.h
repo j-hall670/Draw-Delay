@@ -32,8 +32,6 @@ private:
     //==============================================================================
     // Your private member variables go here...
 
-    //juce::Label firstLabel;
-
     juce::Array <juce::Point<float>> mousePosArray; // Array of Points in float format - Point is X,Y coordinates, needs to be float because that's what mouse event gives
 
     int drawSquareValues[4]; // Parameters of box

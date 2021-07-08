@@ -7,12 +7,6 @@ MainComponent::MainComponent()
     // you add any child components.
     setSize (800, 600);
 
-    /*
-    addAndMakeVisible (firstLabel);
-    firstLabel.setText ("Hello World!", juce::NotificationType::dontSendNotification);
-    firstLabel.setJustificationType (juce::Justification::centred);
-    */
-
     addAndMakeVisible (undoButton);
     undoButton.setButtonText ("Undo");
     undoButton.addListener (this);
@@ -84,6 +78,13 @@ void MainComponent::paint (juce::Graphics& g)
         int mouseX = mousePosArray.operator[](i).getX() - 5; // - 5 to centre circle on mouse
         int mouseY = mousePosArray.operator[](i).getY() - 5;
 
+        // Big if statement to make sure the circles don't overlap the box's bounds
+        if (mousePosArray.operator[](i).getX() < (drawSquareValues[0] + 5)) // If click is less across than box's x position + 5
+        {
+            mouseX = drawSquareValues[0]; // Set dot's X to the edge of the box
+            // Don't need to change this box X value because the circles are drawn from the top left corner
+        }
+
         g.fillEllipse(mouseX, mouseY, 10, 10); // Draw circle
     }
 }
@@ -94,14 +95,12 @@ void MainComponent::resized()
     // If you add any child components, this is where you should
     // update their positions.
 
-    //firstLabel.setBounds(juce::Component::getWidth() / 2, juce::Component::getHeight() / 2, 50, 50);
-
     undoButton.setBounds (juce::Component::getWidth() / 1.4, juce::Component::getHeight() / 8, juce::Component::getWidth() / 10, juce::Component::getWidth() / 10);
 
-    drawSquareValues[0] = juce::Component::getWidth() / 8;
-    drawSquareValues[1] = juce::Component::getHeight() / 8;
-    drawSquareValues[2] = juce::Component::getWidth() / 2;
-    drawSquareValues[3] = juce::Component::getHeight() / 2;
+    drawSquareValues[0] = juce::Component::getWidth() / 8; // Box X position
+    drawSquareValues[1] = juce::Component::getHeight() / 8;// Box Y position
+    drawSquareValues[2] = juce::Component::getWidth() / 2; // Box width
+    drawSquareValues[3] = juce::Component::getHeight() / 2;// Box height
 }
 
 void MainComponent::mouseDown (const juce::MouseEvent& ev)
