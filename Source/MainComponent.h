@@ -34,9 +34,9 @@ private:
 
     juce::Array <juce::Point<float>> mousePosArray; // Array of Points in float format - Point is X,Y coordinates, needs to be float because that's what mouse event gives
 
-    int drawSquareValues[4]; // Parameters of box
-
     juce::TextButton undoButton;
+
+    juce::Rectangle<float> delayBox; // Rectangle for the delay box
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

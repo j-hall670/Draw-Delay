@@ -13,7 +13,6 @@
 /*
 * if click is within 5px inner border of box, push it back to 5px away from edge
 
-
 if click is less far across than box's x position + 5 
 then set dot position to box's x + 5
 
@@ -25,7 +24,6 @@ then set dot position to y + 5
 
 if click is higher than box's height - 5
 then set dot position to y - 5
-
 */
 
 //^^ got the first one of these working but haven't tried the rest yet

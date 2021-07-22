@@ -70,7 +70,7 @@ void MainComponent::paint (juce::Graphics& g)
 
     // You can add your drawing code here!
 
-    g.drawRect(drawSquareValues[0], drawSquareValues[1], drawSquareValues[2], drawSquareValues[3]);
+    g.drawRect(delayBox);
 
     for (int i = 0; i < mousePosArray.size(); i++)
     {
@@ -78,12 +78,20 @@ void MainComponent::paint (juce::Graphics& g)
         int mouseX = mousePosArray.operator[](i).getX() - 5; // - 5 to centre circle on mouse
         int mouseY = mousePosArray.operator[](i).getY() - 5;
 
+        /*
         // Big if statement to make sure the circles don't overlap the box's bounds
         if (mousePosArray.operator[](i).getX() < (drawSquareValues[0] + 5)) // If click is less across than box's x position + 5
         {
             mouseX = drawSquareValues[0]; // Set dot's X to the edge of the box
             // Don't need to change this box X value because the circles are drawn from the top left corner
         }
+        else if (mousePosArray.operator[](i).getX() > ((drawSquareValues[0] + drawSquareValues[2]) - 5))
+        {
+            mouseX = (drawSquareValues[0] + drawSquareValues[2]) - 5;
+
+            //it's setting it to halfway across the window - 5. need to add square values [0] and [2] together then - 5 from that
+        }
+        */
 
         g.fillEllipse(mouseX, mouseY, 10, 10); // Draw circle
     }
@@ -97,20 +105,20 @@ void MainComponent::resized()
 
     undoButton.setBounds (juce::Component::getWidth() / 1.4, juce::Component::getHeight() / 8, juce::Component::getWidth() / 10, juce::Component::getWidth() / 10);
 
-    drawSquareValues[0] = juce::Component::getWidth() / 8; // Box X position
-    drawSquareValues[1] = juce::Component::getHeight() / 8;// Box Y position
-    drawSquareValues[2] = juce::Component::getWidth() / 2; // Box width
-    drawSquareValues[3] = juce::Component::getHeight() / 2;// Box height
+    delayBox.setX (juce::Component::getWidth() / 8);       // Box X position
+    delayBox.setY (juce::Component::getHeight() / 8);      // Box Y position
+    delayBox.setWidth (juce::Component::getWidth() / 2);   // Box width
+    delayBox.setHeight (juce::Component::getHeight() / 2); // Box height
 }
 
 void MainComponent::mouseDown (const juce::MouseEvent& ev)
 {
-    // Set width and height of box
-    int width = drawSquareValues[0] + drawSquareValues[2];
-    int height = drawSquareValues[1] + drawSquareValues[3];
+    // Use bounds of box to make width and height for readability 
+    int width = delayBox.getX() + delayBox.getWidth();
+    int height = delayBox.getY() + delayBox.getHeight();
 
     // If click is within the box's bounds
-    if (ev.position.x > drawSquareValues[0] && ev.position.x < width && ev.position.y > drawSquareValues[1] && ev.position.y < height)
+    if (ev.position.x > delayBox.getX() && ev.position.x < width && ev.position.y > delayBox.getY() && ev.position.y < height)
     {
         mousePosArray.add(ev.position); // Add mouse click coordinates to array of points
         repaint();
