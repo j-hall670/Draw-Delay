@@ -78,20 +78,25 @@ void MainComponent::paint (juce::Graphics& g)
         int mouseX = mousePosArray.operator[](i).getX() - 5; // - 5 to centre circle on mouse
         int mouseY = mousePosArray.operator[](i).getY() - 5;
 
-        /*
         // Big if statement to make sure the circles don't overlap the box's bounds
-        if (mousePosArray.operator[](i).getX() < (drawSquareValues[0] + 5)) // If click is less across than box's x position + 5
+        if (mousePosArray.operator[](i).getX() < (delayBox.getX() + 5)) // If click is less across than box's x position + 5
         {
-            mouseX = drawSquareValues[0]; // Set dot's X to the edge of the box
+            mouseX = delayBox.getX(); // Set dot's X to the edge of the box
             // Don't need to change this box X value because the circles are drawn from the top left corner
         }
-        else if (mousePosArray.operator[](i).getX() > ((drawSquareValues[0] + drawSquareValues[2]) - 5))
+        if (mousePosArray.operator[](i).getX() > (delayBox.getRight() - 5)) // Right
         {
-            mouseX = (drawSquareValues[0] + drawSquareValues[2]) - 5;
-
-            //it's setting it to halfway across the window - 5. need to add square values [0] and [2] together then - 5 from that
+            mouseX = delayBox.getRight() - 10;
         }
-        */
+        if (mousePosArray.operator[](i).getY() < (delayBox.getY() + 5)) // Top
+        {
+            mouseY = delayBox.getY(); 
+        }
+        if (mousePosArray.operator[](i).getY() > (delayBox.getBottom() - 5)) // Bottom
+        {
+            mouseY = delayBox.getBottom() - 10;
+        }
+        
 
         g.fillEllipse(mouseX, mouseY, 10, 10); // Draw circle
     }
