@@ -9,6 +9,17 @@
 //Todo:
 //==============================================================================
 
+//Get audio functionality
+//  Load and read file of drum sound - it's an mp3
+//  Play through app
+
+//Make the delay effect:
+//Make a basic one/use the juce one if there is one
+//Surface the parameters normally
+//Map circles to a value from 0ms-5000ms (to start with)
+//  a 1 sec buffer would be bufferSize = sampleRate * samplesPerBlock
+//Test plugging those values into the buffer and write the delays
+
 //Get the circles to disappear if you click them again:
 /*
 If i click within the bounds of a square, remove those coordinates from the array:

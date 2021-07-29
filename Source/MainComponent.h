@@ -38,5 +38,8 @@ private:
 
     juce::Rectangle<float> delayBox; // Rectangle for the delay box
 
+    juce::TextButton openButton;  // For opening audio files
+    juce::TextButton playButton;  // For playing the audio file
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

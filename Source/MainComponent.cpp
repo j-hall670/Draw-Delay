@@ -11,6 +11,14 @@ MainComponent::MainComponent()
     undoButton.setButtonText ("Undo");
     undoButton.addListener (this);
 
+    addAndMakeVisible (openButton);
+    openButton.setButtonText ("Open");
+    openButton.addListener (this);
+
+    addAndMakeVisible (playButton);
+    playButton.setButtonText ("Play");
+    playButton.addListener (this);
+
     // Some platforms require permissions to open input channels so request that here
     if (juce::RuntimePermissions::isRequired (juce::RuntimePermissions::recordAudio)
         && ! juce::RuntimePermissions::isGranted (juce::RuntimePermissions::recordAudio))
@@ -109,6 +117,8 @@ void MainComponent::resized()
     // update their positions.
 
     undoButton.setBounds (juce::Component::getWidth() / 1.4, juce::Component::getHeight() / 8, juce::Component::getWidth() / 10, juce::Component::getWidth() / 10);
+    openButton.setBounds (juce::Component::getWidth() / 1.4, juce::Component::getHeight() / 3, juce::Component::getWidth() / 10, juce::Component::getWidth() / 10);
+    playButton.setBounds (juce::Component::getWidth() / 1.4, juce::Component::getHeight() / 2.05, juce::Component::getWidth() / 10, juce::Component::getWidth() / 10);
 
     delayBox.setX (juce::Component::getWidth() / 8);       // Box X position
     delayBox.setY (juce::Component::getHeight() / 8);      // Box Y position
