@@ -10,8 +10,8 @@
 //==============================================================================
 
 //Get audio functionality
-//  Load and read file of drum sound - it's an mp3
-//  Play through app
+//  Got audio playing working but you have to open the file each time so it's a bit annoying
+// Need to get it working properly
 
 //Make the delay effect:
 //Make a basic one/use the juce one if there is one

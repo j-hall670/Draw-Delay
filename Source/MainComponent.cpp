@@ -3,8 +3,6 @@
 //==============================================================================
 MainComponent::MainComponent()
 {
-    // Make sure you set the size of the component after
-    // you add any child components.
     setSize (800, 600);
 
     addAndMakeVisible (undoButton);
@@ -18,6 +16,9 @@ MainComponent::MainComponent()
     addAndMakeVisible (playButton);
     playButton.setButtonText ("Play");
     playButton.onClick = [this] { playButtonClicked(); };
+    playButton.setEnabled (false);
+
+    formatManager.registerBasicFormats(); // Register audio formats
 
     // Some platforms require permissions to open input channels so request that here
     if (juce::RuntimePermissions::isRequired (juce::RuntimePermissions::recordAudio)
@@ -49,6 +50,8 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRat
     // but be careful - it will be called on the audio thread, not the GUI thread.
 
     // For more details, see the help for AudioProcessor::prepareToPlay()
+
+    transportSource.prepareToPlay (samplesPerBlockExpected, sampleRate);
 }
 
 void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill)
@@ -59,7 +62,14 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
 
     // Right now we are not producing any data, in which case we need to clear the buffer
     // (to prevent the output of random noise)
-    bufferToFill.clearActiveBufferRegion();
+
+    if (readerSource.get() == nullptr)
+    {
+        bufferToFill.clearActiveBufferRegion();
+        return;
+    }
+
+    transportSource.getNextAudioBlock (bufferToFill);
 }
 
 void MainComponent::releaseResources()
@@ -68,6 +78,8 @@ void MainComponent::releaseResources()
     // restarted due to a setting change.
 
     // For more details, see the help for AudioProcessor::releaseResources()
+
+    transportSource.releaseResources();
 }
 
 //==============================================================================
@@ -154,10 +166,24 @@ void MainComponent::undoButtonClicked()
 
 void MainComponent::openButtonClicked()
 {
-    DBG("Open");
+    juce::FileChooser chooser("Select an mp3 file to play...", {}, "*.mp3");
+
+    if (chooser.browseForFileToOpen())                                          
+    {
+        auto file = chooser.getResult();                                       
+        auto* reader = formatManager.createReaderFor (file);                    
+
+        if (reader != nullptr)
+        {
+            std::unique_ptr<juce::AudioFormatReaderSource> newSource (new juce::AudioFormatReaderSource (reader, true)); 
+            transportSource.setSource (newSource.get(), 0, nullptr, reader->sampleRate);                                 
+            playButton.setEnabled (true);                                                                                
+            readerSource.reset (newSource.release());                                                                    
+        }
+    }
 }
 
 void MainComponent::playButtonClicked()
 {
-    DBG("play");
+    transportSource.start();
 }
