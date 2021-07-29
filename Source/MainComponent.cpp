@@ -9,15 +9,15 @@ MainComponent::MainComponent()
 
     addAndMakeVisible (undoButton);
     undoButton.setButtonText ("Undo");
-    undoButton.addListener (this);
+    undoButton.onClick = [this] { undoButtonClicked(); };
 
     addAndMakeVisible (openButton);
     openButton.setButtonText ("Open");
-    openButton.addListener (this);
+    openButton.onClick = [this] { openButtonClicked(); };
 
     addAndMakeVisible (playButton);
     playButton.setButtonText ("Play");
-    playButton.addListener (this);
+    playButton.onClick = [this] { playButtonClicked(); };
 
     // Some platforms require permissions to open input channels so request that here
     if (juce::RuntimePermissions::isRequired (juce::RuntimePermissions::recordAudio)
@@ -140,7 +140,7 @@ void MainComponent::mouseDown (const juce::MouseEvent& ev)
     }
 }
 
-void MainComponent::buttonClicked(juce::Button* button) 
+void MainComponent::undoButtonClicked()
 {
     // If circles have been drawn
     if (mousePosArray.size() > 0)
@@ -150,4 +150,14 @@ void MainComponent::buttonClicked(juce::Button* button)
         mousePosArray.remove(element);
         repaint();
     }
+}
+
+void MainComponent::openButtonClicked()
+{
+    DBG("Open");
+}
+
+void MainComponent::playButtonClicked()
+{
+    DBG("play");
 }
