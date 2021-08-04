@@ -23,6 +23,8 @@ If i click within the bounds of a square, remove those coordinates from the arra
     if coordinates already exist within array then remove item from array and move every other item along
         iterate through array starting on number of member that was deleted and go [i] = [i+1] etc. etc. - would this work?
 decrement arrayCount
+
+Don't get rid of the undo button when you do this
 */
 
 //Less important:

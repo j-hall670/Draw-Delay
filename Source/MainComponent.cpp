@@ -99,8 +99,6 @@ void MainComponent::paint (juce::Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
-    // You can add your drawing code here!
-
     g.drawRect(delayBox);
 
     for (int i = 0; i < mousePosArray.size(); i++)
@@ -177,19 +175,22 @@ void MainComponent::undoButtonClicked()
 
 void MainComponent::openButtonClicked()
 {
+    // Declare file chooser and make sure it can only open mp3s
     juce::FileChooser chooser("Select an mp3 file to play...", {}, "*.mp3");
 
+    // Open file chooser - if succeeds if user actually selects a file rather than cancelling
     if (chooser.browseForFileToOpen())                                          
     {
-        auto file = chooser.getResult();                                       
-        auto* reader = formatManager.createReaderFor (file);                    
+        auto file = chooser.getResult(); // Get file                                      
+        auto* reader = formatManager.createReaderFor (file); // Create a reader to read the file - is new because it needs to be deleted when out of scope.
 
-        if (reader != nullptr)
+        if (reader != nullptr) // If reader works - returns nullptr if file is not a format that AudioFormatManager can handle
         {
-            std::unique_ptr<juce::AudioFormatReaderSource> newSource (new juce::AudioFormatReaderSource (reader, true)); 
-            transportSource.setSource (newSource.get(), 0, nullptr, reader->sampleRate);                                 
+            std::unique_ptr<juce::AudioFormatReaderSource> newSource (new juce::AudioFormatReaderSource (reader, true)); // Make new source
+            // - declare as a unique ptr to avoid deleting previously allocated AudioFormatReaderSource on subsequent open file commands
+            transportSource.setSource (newSource.get(), 0, nullptr, reader->sampleRate); // Connect reader to AudioTransportSource for use in getNextAudioBlock()                                
             playButton.setEnabled (true);                                                                                
-            readerSource.reset (newSource.release());                                                                    
+            readerSource.reset (newSource.release()); // Safely release source resources as we have passed newSource's data on                                                                     
         }
     }
 }
