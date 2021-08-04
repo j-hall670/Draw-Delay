@@ -9,10 +9,6 @@
 //Todo:
 //==============================================================================
 
-//Get audio functionality
-//  Got audio playing working but you have to open the file each time so it's a bit annoying
-// Need to get it working properly
-
 //Make the delay effect:
 //Make a basic one/use the juce one if there is one
 //Surface the parameters normally

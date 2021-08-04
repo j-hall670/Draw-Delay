@@ -70,6 +70,17 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
     }
 
     transportSource.getNextAudioBlock (bufferToFill);
+
+    /* Just seeing if start() stops the file playing automatically when the file runs out - it does
+    if (transportSource.isPlaying())
+    {
+        DBG("Playing");
+    }
+    else if (!transportSource.isPlaying())
+    {
+        DBG("Not Playing");
+    }
+    */
 }
 
 void MainComponent::releaseResources()
@@ -79,7 +90,7 @@ void MainComponent::releaseResources()
 
     // For more details, see the help for AudioProcessor::releaseResources()
 
-    transportSource.releaseResources();
+    //transportSource.releaseResources();
 }
 
 //==============================================================================
@@ -185,5 +196,6 @@ void MainComponent::openButtonClicked()
 
 void MainComponent::playButtonClicked()
 {
-    transportSource.start();
+    transportSource.setPosition(0); // Reset the file position
+    transportSource.start(); // Start playback
 }
