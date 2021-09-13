@@ -63,7 +63,7 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
     // Right now we are not producing any data, in which case we need to clear the buffer
     // (to prevent the output of random noise)
 
-    if (readerSource.get() == nullptr)
+    if (readerSource.get() == nullptr) // Check for valid reader source
     {
         bufferToFill.clearActiveBufferRegion();
         return;
@@ -153,8 +153,26 @@ void MainComponent::mouseDown (const juce::MouseEvent& ev)
     int width = delayBox.getX() + delayBox.getWidth();
     int height = delayBox.getY() + delayBox.getHeight();
 
-    // If click is within the box's bounds
-    if (ev.position.x > delayBox.getX() && ev.position.x < width && ev.position.y > delayBox.getY() && ev.position.y < height)
+    bool removing = false;
+
+    // This works but doesn't seem to remove the circles from the bottom left of the delayBox so that's a bit strange
+    for (int i = 0; i <= mousePosArray.size(); i++)
+    {
+        // If the click position is within the bounds of a drawn cirle in the array
+        if ((juce::Range<float>(mousePosArray[i].getX() - 5, mousePosArray[i].getX() + 5).contains(ev.position.getX())) && (juce::Range<float>(mousePosArray[i].getY() - 5, mousePosArray[i].getX() + 5).contains(ev.position.getY())))
+        {
+            DBG("Removing");
+
+            // Remove element from array 
+            mousePosArray.remove(i);
+            repaint();
+            removing = true;
+        }
+    }
+
+
+    // If click is within the box's bounds and circle hasn't just been removed
+    if ((ev.position.x > delayBox.getX() && ev.position.x < width && ev.position.y > delayBox.getY() && ev.position.y < height) && removing == false)
     {
         mousePosArray.add(ev.position); // Add mouse click coordinates to array of points
         repaint();

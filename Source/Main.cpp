@@ -18,13 +18,7 @@
 
 //Get the circles to disappear if you click them again:
 /*
-If i click within the bounds of a square, remove those coordinates from the array:
-    iterate through array on click
-    if coordinates already exist within array then remove item from array and move every other item along
-        iterate through array starting on number of member that was deleted and go [i] = [i+1] etc. etc. - would this work?
-decrement arrayCount
-
-Don't get rid of the undo button when you do this
+Fix it - doesn't get rid of the cirlces if they're in the bottom left of the delayBox
 */
 
 //Less important:
