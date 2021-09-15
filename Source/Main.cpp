@@ -16,11 +16,6 @@
 //  a 1 sec buffer would be bufferSize = sampleRate * samplesPerBlock
 //Test plugging those values into the buffer and write the delays
 
-//Get the circles to disappear if you click them again:
-/*
-Fix it - doesn't get rid of the cirlces if they're in the bottom left of the delayBox
-*/
-
 //Less important:
 //Make circles position (and size?) scalable to the window
 

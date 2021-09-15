@@ -155,16 +155,19 @@ void MainComponent::mouseDown (const juce::MouseEvent& ev)
 
     bool removing = false;
 
-    // If click is within the box's bounds and circle hasn't just been removed
+    // If click is within the box's bounds
     if (ev.position.x > delayBox.getX() && ev.position.x < width && ev.position.y > delayBox.getY() && ev.position.y < height)
     {
-        // This works but doesn't seem to remove the circles from the bottom left of the delayBox so that's a bit strange
-        for (int i = 0; i <= mousePosArray.size(); i++)
+        // Search array 
+        for (int i = 0; i < mousePosArray.size(); i++)
         {
             // If the click position is within the bounds of a drawn cirle in the array
-            if ((juce::Range<float>(mousePosArray[i].getX() - 5, mousePosArray[i].getX() + 5).contains(ev.position.getX())) && (juce::Range<float>(mousePosArray[i].getY() - 5, mousePosArray[i].getX() + 5).contains(ev.position.getY())))
+            if ((juce::Range<float>(mousePosArray[i].getX() - 5, mousePosArray[i].getX() + 5).contains(ev.position.getX())) && (juce::Range<float>(mousePosArray[i].getY() - 5, mousePosArray[i].getY() + 5).contains(ev.position.getY())))
             {
-                DBG("Removing");
+                // Debugging 
+                DBG("\nRemoving:");
+                DBG("mouse = " << ev.position.getX() << ", " << ev.position.getY());
+                DBG("circle = " << mousePosArray[i].getX() << ", " << mousePosArray[i].getY());
 
                 // Remove element from array 
                 mousePosArray.remove(i);
@@ -176,6 +179,12 @@ void MainComponent::mouseDown (const juce::MouseEvent& ev)
         if (removing == false)
         {
             mousePosArray.add(ev.position); // Add mouse click coordinates to array of points
+
+            // Debugging
+            DBG("\nAdding:");
+            DBG("mouse = " << ev.position.getX() << ", " << ev.position.getY());
+            DBG("circle = " << mousePosArray.getLast().getX() << ", " << mousePosArray.getLast().getY());
+
             repaint();
         }
     }
