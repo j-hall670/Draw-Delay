@@ -17,6 +17,11 @@ MainComponent::MainComponent()
     playButton.setButtonText ("Play");
     playButton.onClick = [this] { playButtonClicked(); };
     playButton.setEnabled (false);
+    
+    addAndMakeVisible (volumeSlider);
+    volumeSlider.setSliderStyle (juce::Slider::SliderStyle::LinearBarVertical);
+    volumeSlider.setRange (0, 1.0);
+    volumeSlider.addListener (this);
 
     formatManager.registerBasicFormats(); // Register audio formats
 
@@ -68,19 +73,11 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
         bufferToFill.clearActiveBufferRegion();
         return;
     }
-
+    
     transportSource.getNextAudioBlock (bufferToFill);
-
-    /* Just seeing if start() stops the file playing automatically when the file runs out - it does
-    if (transportSource.isPlaying())
-    {
-        DBG("Playing");
-    }
-    else if (!transportSource.isPlaying())
-    {
-        DBG("Not Playing");
-    }
-    */
+    
+    // Apply slider volume
+    bufferToFill.buffer->applyGain (volumeSlider.getValue());
 }
 
 void MainComponent::releaseResources()
@@ -140,6 +137,7 @@ void MainComponent::resized()
     undoButton.setBounds (juce::Component::getWidth() / 1.4, juce::Component::getHeight() / 8, juce::Component::getWidth() / 10, juce::Component::getWidth() / 10);
     openButton.setBounds (juce::Component::getWidth() / 1.4, juce::Component::getHeight() / 3, juce::Component::getWidth() / 10, juce::Component::getWidth() / 10);
     playButton.setBounds (juce::Component::getWidth() / 1.4, juce::Component::getHeight() / 2.05, juce::Component::getWidth() / 10, juce::Component::getWidth() / 10);
+    volumeSlider.setBounds (juce::Component::getWidth() / 1.4, juce::Component::getHeight() / 1.5, juce::Component::getWidth() / 10, juce::Component::getWidth() / 10);
 
     delayBox.setX (juce::Component::getWidth() / 8);       // Box X position
     delayBox.setY (juce::Component::getHeight() / 8);      // Box Y position
@@ -229,3 +227,5 @@ void MainComponent::playButtonClicked()
     transportSource.setPosition(0); // Reset the file position
     transportSource.start(); // Start playback
 }
+
+void MainComponent::sliderValueChanged(juce::Slider* volumeSlider) {}

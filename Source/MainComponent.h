@@ -8,7 +8,8 @@
     This component lives inside our window, and this is where you should put all
     your controls and content.
 */
-class MainComponent  : public juce::AudioAppComponent
+class MainComponent  : public juce::AudioAppComponent,
+                       public juce::Slider::Listener
 {
 public:
     //==============================================================================
@@ -25,6 +26,8 @@ public:
     void resized() override;
 
     void mouseDown (const juce::MouseEvent& ev) override;
+    
+    void sliderValueChanged (juce::Slider* volumeSlider) override;
 
 private:
     //==============================================================================
@@ -38,6 +41,8 @@ private:
 
     juce::TextButton openButton;  // For opening audio files
     juce::TextButton playButton;  // For playing the audio file
+    
+    juce::Slider volumeSlider; // For controlling output level
 
     // Button clicks
     void undoButtonClicked();
