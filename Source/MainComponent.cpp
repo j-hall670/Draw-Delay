@@ -48,26 +48,14 @@ MainComponent::~MainComponent()
 //==============================================================================
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
-    // This function will be called when the audio device is started, or when
-    // its settings (i.e. sample rate, block size, etc) are changed.
-
-    // You can use this function to initialise any resources you might need,
-    // but be careful - it will be called on the audio thread, not the GUI thread.
-
-    // For more details, see the help for AudioProcessor::prepareToPlay()
-
     transportSource.prepareToPlay (samplesPerBlockExpected, sampleRate);
+
+    delayBuffer.setSize (2, 2.0 * (samplesPerBlockExpected + sampleRate), false, true);
+    globalSampleRate = sampleRate;
 }
 
 void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& bufferToFill)
 {
-    // Your audio-processing code goes here!
-
-    // For more details, see the help for AudioProcessor::getNextAudioBlock()
-
-    // Right now we are not producing any data, in which case we need to clear the buffer
-    // (to prevent the output of random noise)
-
     if (readerSource.get() == nullptr) // Check for valid reader source
     {
         bufferToFill.clearActiveBufferRegion();
@@ -76,6 +64,31 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
     
     transportSource.getNextAudioBlock (bufferToFill);
     
+    // Declaring these for readability
+    const int bufferLength = bufferToFill.buffer->getNumSamples();
+    const int delayBufferLength = delayBuffer.getNumSamples();
+
+    for (int channel = 0; channel < bufferToFill.buffer->getNumChannels(); ++channel)
+    {
+        const float* bufferData = bufferToFill.buffer->getReadPointer(channel);
+        const float* delayBufferData = delayBuffer.getReadPointer(channel);
+        float* dryBuffer = bufferToFill.buffer->getWritePointer(channel);
+
+        fillDelayBuffer(channel, bufferLength, delayBufferLength, bufferData, delayBufferData);
+        getFromDelayBuffer(*bufferToFill.buffer, channel, bufferLength, delayBufferLength, bufferData, delayBufferData); // THIS MAY NOT WORK - PASSING DEREFERENCED BUFFER INTO FUNCTION
+        feedbackDelay(channel, bufferLength, delayBufferLength, dryBuffer);
+    }
+
+    writePosition += bufferLength; // When buffer has been processed, move write position to the next value so it becomes e.g. 513 not 0 again
+    writePosition %= delayBufferLength; // Look below for explanation
+    /*
+    This has the effect of wrapping the value back around to 0.
+    So when delayBufferLength gets to its maximum value, mWritePosition will become the same number as delayBufferLength
+    So modulo divides mWritePosition by delayBufferLength which is the same as dividing it by itself.
+    Dividing by itself = 1 with remainder 0.
+    So mWritePosition becomes 0.
+    */
+
     // Apply slider volume
     bufferToFill.buffer->applyGain (volumeSlider.getValue());
 }
@@ -229,3 +242,55 @@ void MainComponent::playButtonClicked()
 }
 
 void MainComponent::sliderValueChanged(juce::Slider* volumeSlider) {}
+
+void MainComponent::fillDelayBuffer(int channel, const int bufferLength, const int delayBufferLength, const float* bufferData, const float* delayBufferData)
+{
+    const float gain = 0.3;
+
+    // Copy data from main buffer to delay buffer - this is a bit fiddly because the buffers are different lengths
+        // This if alone won't fill the buffer because buffer is smaller than mDelayBuffer 
+    if (delayBufferLength > bufferLength + writePosition)
+    {
+        delayBuffer.copyFromWithRamp(channel, writePosition, bufferData, bufferLength, gain, gain);
+    }
+    // So we have to catch the rest of them - look at TAP delay pt 1 tutorial for explanation of this
+    else
+    {
+        const int bufferRemaining = delayBufferLength - writePosition; // This is the number of values left to move after the if above ^
+
+        delayBuffer.copyFromWithRamp(channel, writePosition, bufferData + bufferRemaining, bufferRemaining, 0.8, 0.8);
+        delayBuffer.copyFromWithRamp(channel, 0, bufferData + bufferRemaining, bufferLength - bufferRemaining, 0.8, 0.8); // Wrap to start of buffer
+    }
+}
+
+void MainComponent::getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const int delayBufferLength, const float* bufferData, const float* delayBufferData)
+{
+    int delayTime = 200;
+    const int readPosition = static_cast<int> (delayBufferLength + writePosition - (globalSampleRate * delayTime / 1000)) % delayBufferLength;
+
+    if (delayBufferLength > bufferLength + readPosition)
+    {
+        buffer.copyFrom(channel, 0, delayBufferData + readPosition, bufferLength);
+    }
+    else
+    {
+        const int bufferRemaining = delayBufferLength - readPosition;
+        buffer.copyFrom(channel, 0, delayBufferData + readPosition, bufferRemaining);
+        buffer.copyFrom(channel, bufferRemaining, delayBufferData, bufferLength - bufferRemaining);
+    }
+}
+
+void MainComponent::feedbackDelay(int channel, const int bufferLength, const int delayBufferLength, float* dryBuffer)
+{
+    if (delayBufferLength > bufferLength + writePosition)
+    {
+        delayBuffer.addFromWithRamp(channel, writePosition, dryBuffer, bufferLength, 0.8, 0.8);
+    }
+    else
+    {
+        const int bufferRemaining = delayBufferLength - writePosition;
+
+        delayBuffer.addFromWithRamp(channel, bufferRemaining, dryBuffer, bufferRemaining, 0.8, 0.8);
+        delayBuffer.addFromWithRamp(channel, 0, dryBuffer, bufferLength - bufferRemaining, 0.8, 0.8);
+    }
+}

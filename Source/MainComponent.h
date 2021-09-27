@@ -29,6 +29,11 @@ public:
     
     void sliderValueChanged (juce::Slider* volumeSlider) override;
 
+    void fillDelayBuffer(int channel, const int bufferLength, const int delayBufferLength, const float* bufferData, const float* delayBufferData);
+    void getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const int delayBufferLength, const float* bufferData, const float* delayBufferData);
+
+    void feedbackDelay(int channel, const int bufferLength, const int delayBufferLength, float* dryBuffer);
+
 private:
     //==============================================================================
     // Your private member variables go here...
@@ -53,6 +58,11 @@ private:
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource; // To read from AudioFormatReader
     juce::AudioTransportSource transportSource; // Basically a positionable audio source with extra features for usability 
+
+    // Circular buffer
+    juce::AudioBuffer<float> delayBuffer;
+    int writePosition{ 0 };
+    int globalSampleRate{ 44100 }; 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
