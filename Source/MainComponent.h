@@ -63,6 +63,7 @@ private:
     juce::AudioBuffer<float> delayBuffer;
     int writePosition{ 0 };
     int globalSampleRate{ 44100 }; 
+    const float maximumDelayTimeS = 5.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

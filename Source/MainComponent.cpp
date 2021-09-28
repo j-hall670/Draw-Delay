@@ -50,7 +50,7 @@ void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRat
 {
     transportSource.prepareToPlay (samplesPerBlockExpected, sampleRate);
 
-    delayBuffer.setSize (2, 2.0 * (samplesPerBlockExpected + sampleRate), false, true);
+    delayBuffer.setSize (2, maximumDelayTimeS * (samplesPerBlockExpected + sampleRate), false, true);
     globalSampleRate = sampleRate;
 }
 
@@ -75,7 +75,7 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
         float* dryBuffer = bufferToFill.buffer->getWritePointer(channel);
 
         fillDelayBuffer(channel, bufferLength, delayBufferLength, bufferData, delayBufferData);
-        getFromDelayBuffer(*bufferToFill.buffer, channel, bufferLength, delayBufferLength, bufferData, delayBufferData); // THIS MAY NOT WORK - PASSING DEREFERENCED BUFFER INTO FUNCTION
+        getFromDelayBuffer(*bufferToFill.buffer, channel, bufferLength, delayBufferLength, bufferData, delayBufferData); 
         feedbackDelay(channel, bufferLength, delayBufferLength, dryBuffer);
     }
 
@@ -248,7 +248,8 @@ void MainComponent::fillDelayBuffer(int channel, const int bufferLength, const i
     const float gain = 0.3;
 
     // Copy data from main buffer to delay buffer - this is a bit fiddly because the buffers are different lengths
-        // This if alone won't fill the buffer because buffer is smaller than mDelayBuffer 
+    
+    // This if alone won't fill the buffer because buffer is smaller than mDelayBuffer 
     if (delayBufferLength > bufferLength + writePosition)
     {
         delayBuffer.copyFromWithRamp(channel, writePosition, bufferData, bufferLength, gain, gain);
@@ -265,18 +266,18 @@ void MainComponent::fillDelayBuffer(int channel, const int bufferLength, const i
 
 void MainComponent::getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const int delayBufferLength, const float* bufferData, const float* delayBufferData)
 {
-    int delayTime = 200;
-    const int readPosition = static_cast<int> (delayBufferLength + writePosition - (globalSampleRate * delayTime / 1000)) % delayBufferLength;
+    int delayTimeMS = 200;
+    const int readPosition = static_cast<int> (delayBufferLength + writePosition - (globalSampleRate * delayTimeMS / 1000)) % delayBufferLength;
 
     if (delayBufferLength > bufferLength + readPosition)
     {
-        buffer.copyFrom(channel, 0, delayBufferData + readPosition, bufferLength);
+        buffer.addFrom(channel, 0, delayBufferData + readPosition, bufferLength);
     }
     else
     {
         const int bufferRemaining = delayBufferLength - readPosition;
-        buffer.copyFrom(channel, 0, delayBufferData + readPosition, bufferRemaining);
-        buffer.copyFrom(channel, bufferRemaining, delayBufferData, bufferLength - bufferRemaining);
+        buffer.addFrom(channel, 0, delayBufferData + readPosition, bufferRemaining);
+        buffer.addFrom(channel, bufferRemaining, delayBufferData, bufferLength - bufferRemaining);
     }
 }
 
