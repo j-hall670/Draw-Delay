@@ -206,8 +206,8 @@ void MainComponent::mouseDown (const juce::MouseEvent& ev)
             float gainRange = 1.0;
             float yCoordRange = (delayBox.getY() + delayBox.getHeight()) - delayBox.getY();
             float newGain = (((ev.position.getY() - delayBox.getY()) * gainRange) / yCoordRange);
+            newGain = 1 - newGain; // Invert range
             delayGains.add(newGain);
-            newGain = 1 - newGain;
 
             // Debugging
             DBG("\nAdding:");
@@ -229,6 +229,8 @@ void MainComponent::undoButtonClicked()
         // Remove them
         int element = mousePosArray.size() - 1; // -1 because element index starts at 0
         mousePosArray.remove(element);
+        delayTimesMS.remove(element);
+        delayGains.remove(element);
         repaint();
     }
 }
