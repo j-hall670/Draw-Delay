@@ -278,18 +278,26 @@ void MainComponent::fillDelayBuffer(int channel, const int bufferLength, const i
 void MainComponent::getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const int delayBufferLength, const float* bufferData, const float* delayBufferData)
 {
     //int delayTimeMS = 200;
-    int delayTimeMS = delayTimesMS[0];
-    const int readPosition = static_cast<int> (delayBufferLength + writePosition - (globalSampleRate * delayTimeMS / 1000)) % delayBufferLength;
+    //int delayTimeMS = delayTimesMS[0];
+    //const int readPosition = static_cast<int> (delayBufferLength + writePosition - (globalSampleRate * delayTimeMS / 1000)) % delayBufferLength;
 
-    if (delayBufferLength > bufferLength + readPosition)
+    juce::Array<int> readPositions;
+    for (int i = 0; i < delayTimesMS.size(); i++)
     {
-        buffer.addFrom(channel, 0, delayBufferData + readPosition, bufferLength);
-    }
-    else
-    {
-        const int bufferRemaining = delayBufferLength - readPosition;
-        buffer.addFrom(channel, 0, delayBufferData + readPosition, bufferRemaining);
-        buffer.addFrom(channel, bufferRemaining, delayBufferData, bufferLength - bufferRemaining);
+        // Add read positions to array
+        readPositions.add(static_cast<int> (delayBufferLength + writePosition - (globalSampleRate * delayTimesMS[i] / 1000)) % delayBufferLength);
+
+        // Add the delayed values back to the main buffer
+        if (delayBufferLength > bufferLength + readPositions[i])
+        {
+            buffer.addFrom(channel, 0, delayBufferData + readPositions[i], bufferLength);
+        }
+        else
+        {
+            const int bufferRemaining = delayBufferLength - readPositions[i];
+            buffer.addFrom(channel, 0, delayBufferData + readPositions[i], bufferRemaining);
+            buffer.addFrom(channel, bufferRemaining, delayBufferData, bufferLength - bufferRemaining);
+        }
     }
 }
 
