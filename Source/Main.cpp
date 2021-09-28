@@ -9,9 +9,11 @@
 //Todo:
 //==============================================================================
 
-// Get circle x coordinate and convert it to value from 0-maximumDelayTimeS in milliseconds
-// Get circle y coordinate and convert it to a gain value from 0-1.0
-
+// Label the delay box with delay time and gain
+// Make delay time variable
+// Fix audio glitches
+// Have bar that runs across delay box to visualise delay times
+// 
 //Less important:
 //Make circles position (and size?) scalable to the window
 
