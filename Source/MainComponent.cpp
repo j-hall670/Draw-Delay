@@ -76,7 +76,7 @@ void MainComponent::getNextAudioBlock (const juce::AudioSourceChannelInfo& buffe
 
         fillDelayBuffer(channel, bufferLength, delayBufferLength, bufferData, delayBufferData);
         getFromDelayBuffer(*bufferToFill.buffer, channel, bufferLength, delayBufferLength, bufferData, delayBufferData); 
-        feedbackDelay(channel, bufferLength, delayBufferLength, dryBuffer);
+        //feedbackDelay(channel, bufferLength, delayBufferLength, dryBuffer);
     }
 
     writePosition += bufferLength; // When buffer has been processed, move write position to the next value so it becomes e.g. 513 not 0 again
@@ -182,6 +182,10 @@ void MainComponent::mouseDown (const juce::MouseEvent& ev)
 
                 // Remove element from array 
                 mousePosArray.remove(i);
+
+                // Remove from delay array
+                delayTimesMS.remove(i);
+
                 repaint();
                 removing = true;
             }
@@ -191,10 +195,17 @@ void MainComponent::mouseDown (const juce::MouseEvent& ev)
         {
             mousePosArray.add(ev.position); // Add mouse click coordinates to array of points
 
+            // Map x coordinate to delayTimesMS value
+            int timeRange = maximumDelayTimeS * 1000;
+            int coordRange = (delayBox.getX() + delayBox.getWidth()) - delayBox.getX();
+            int newTime = (((ev.position.getX() - delayBox.getX()) * timeRange) / coordRange);
+            delayTimesMS.add(newTime);
+
             // Debugging
             DBG("\nAdding:");
             DBG("mouse = " << ev.position.getX() << ", " << ev.position.getY());
             DBG("circle = " << mousePosArray.getLast().getX() << ", " << mousePosArray.getLast().getY());
+            DBG("delay = " << newTime << "ms");
 
             repaint();
         }
@@ -266,7 +277,8 @@ void MainComponent::fillDelayBuffer(int channel, const int bufferLength, const i
 
 void MainComponent::getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int channel, const int bufferLength, const int delayBufferLength, const float* bufferData, const float* delayBufferData)
 {
-    int delayTimeMS = 200;
+    //int delayTimeMS = 200;
+    int delayTimeMS = delayTimesMS[0];
     const int readPosition = static_cast<int> (delayBufferLength + writePosition - (globalSampleRate * delayTimeMS / 1000)) % delayBufferLength;
 
     if (delayBufferLength > bufferLength + readPosition)

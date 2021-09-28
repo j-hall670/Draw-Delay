@@ -54,7 +54,6 @@ private:
     void openButtonClicked();
     void playButtonClicked();
 
-
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource; // To read from AudioFormatReader
     juce::AudioTransportSource transportSource; // Basically a positionable audio source with extra features for usability 
@@ -64,6 +63,8 @@ private:
     int writePosition{ 0 };
     int globalSampleRate{ 44100 }; 
     const float maximumDelayTimeS = 5.0f;
+
+    juce::Array<int> delayTimesMS;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
