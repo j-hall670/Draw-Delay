@@ -9,12 +9,8 @@
 //Todo:
 //==============================================================================
 
-//Make the delay effect:
-//Make a basic one/use the juce one if there is one
-//Surface the parameters normally
-//Map circles to a value from 0ms-5000ms (to start with)
-//  a 1 sec buffer would be bufferSize = sampleRate * samplesPerBlock
-//Test plugging those values into the buffer and write the delays
+// Get circle x coordinate and convert it to value from 0-maximumDelayTimeS in milliseconds
+// Get circle y coordinate and convert it to a gain value from 0-1.0
 
 //Less important:
 //Make circles position (and size?) scalable to the window
