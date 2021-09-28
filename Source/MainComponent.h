@@ -65,6 +65,7 @@ private:
     const float maximumDelayTimeS = 5.0f;
 
     juce::Array<int> delayTimesMS;
+    juce::Array<float> delayGains;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

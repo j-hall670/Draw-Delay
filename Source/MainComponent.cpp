@@ -183,8 +183,9 @@ void MainComponent::mouseDown (const juce::MouseEvent& ev)
                 // Remove element from array 
                 mousePosArray.remove(i);
 
-                // Remove from delay array
+                // Remove from delay arrays
                 delayTimesMS.remove(i);
+                delayGains.remove(i);
 
                 repaint();
                 removing = true;
@@ -197,15 +198,23 @@ void MainComponent::mouseDown (const juce::MouseEvent& ev)
 
             // Map x coordinate to delayTimesMS value
             int timeRange = maximumDelayTimeS * 1000;
-            int coordRange = (delayBox.getX() + delayBox.getWidth()) - delayBox.getX();
-            int newTime = (((ev.position.getX() - delayBox.getX()) * timeRange) / coordRange);
+            float xCoordRange = (delayBox.getX() + delayBox.getWidth()) - delayBox.getX();
+            int newTime = (((ev.position.getX() - delayBox.getX()) * timeRange) / xCoordRange);
             delayTimesMS.add(newTime);
+
+            // Map y coordinate to delayGains value
+            float gainRange = 1.0;
+            float yCoordRange = (delayBox.getY() + delayBox.getHeight()) - delayBox.getY();
+            float newGain = (((ev.position.getY() - delayBox.getY()) * gainRange) / yCoordRange);
+            delayGains.add(newGain);
+            newGain = 1 - newGain;
 
             // Debugging
             DBG("\nAdding:");
             DBG("mouse = " << ev.position.getX() << ", " << ev.position.getY());
             DBG("circle = " << mousePosArray.getLast().getX() << ", " << mousePosArray.getLast().getY());
             DBG("delay = " << newTime << "ms");
+            DBG("gain = " << newGain);
 
             repaint();
         }
@@ -256,22 +265,20 @@ void MainComponent::sliderValueChanged(juce::Slider* volumeSlider) {}
 
 void MainComponent::fillDelayBuffer(int channel, const int bufferLength, const int delayBufferLength, const float* bufferData, const float* delayBufferData)
 {
-    const float gain = 0.3;
-
     // Copy data from main buffer to delay buffer - this is a bit fiddly because the buffers are different lengths
     
     // This if alone won't fill the buffer because buffer is smaller than mDelayBuffer 
     if (delayBufferLength > bufferLength + writePosition)
     {
-        delayBuffer.copyFromWithRamp(channel, writePosition, bufferData, bufferLength, gain, gain);
+        delayBuffer.copyFromWithRamp(channel, writePosition, bufferData, bufferLength, 1.0, 1.0);
     }
     // So we have to catch the rest of them - look at TAP delay pt 1 tutorial for explanation of this
     else
     {
         const int bufferRemaining = delayBufferLength - writePosition; // This is the number of values left to move after the if above ^
 
-        delayBuffer.copyFromWithRamp(channel, writePosition, bufferData + bufferRemaining, bufferRemaining, 0.8, 0.8);
-        delayBuffer.copyFromWithRamp(channel, 0, bufferData + bufferRemaining, bufferLength - bufferRemaining, 0.8, 0.8); // Wrap to start of buffer
+        delayBuffer.copyFromWithRamp(channel, writePosition, bufferData + bufferRemaining, bufferRemaining, 1.0, 1.0);
+        delayBuffer.copyFromWithRamp(channel, 0, bufferData + bufferRemaining, bufferLength - bufferRemaining, 1.0, 1.0); // Wrap to start of buffer
     }
 }
 
@@ -290,13 +297,13 @@ void MainComponent::getFromDelayBuffer(juce::AudioBuffer<float>& buffer, int cha
         // Add the delayed values back to the main buffer
         if (delayBufferLength > bufferLength + readPositions[i])
         {
-            buffer.addFrom(channel, 0, delayBufferData + readPositions[i], bufferLength);
+            buffer.addFromWithRamp(channel, 0, delayBufferData + readPositions[i], bufferLength, delayGains[i], delayGains[i]);
         }
         else
         {
             const int bufferRemaining = delayBufferLength - readPositions[i];
-            buffer.addFrom(channel, 0, delayBufferData + readPositions[i], bufferRemaining);
-            buffer.addFrom(channel, bufferRemaining, delayBufferData, bufferLength - bufferRemaining);
+            buffer.addFromWithRamp(channel, 0, delayBufferData + readPositions[i], bufferRemaining, delayGains[i], delayGains[i]);
+            buffer.addFromWithRamp(channel, bufferRemaining, delayBufferData, bufferLength - bufferRemaining, delayGains[i], delayGains[i]);
         }
     }
 }
